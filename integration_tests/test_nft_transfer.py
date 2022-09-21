@@ -49,6 +49,22 @@ def query_nft_class(cli, key, param):
     )
 
 
+def query_nft_on_escrow(cli, channel):
+    return str(
+        cli.raw(
+            "query",
+            "nft-transfer",
+            "escrow-address",
+            "nft",
+            channel,
+            home=cli.data_dir,
+            node=cli.node_rpc,
+            output="json",
+        ),
+        "UTF-8",
+    ).strip()
+
+
 # This function tests nft transfer from source chain -> mid chain -> destination chain and all the way back to source
 # chain following the same path
 def test_nft_transfer(cluster):
@@ -178,19 +194,7 @@ def test_nft_transfer(cluster):
     assert rsp["owner"] == addr_mid, rsp
 
     # query nft on source chain's escrow address
-    src_escrow_address = str(
-        cli_src.raw(
-            "query",
-            "nft-transfer",
-            "escrow-address",
-            "nft",
-            src_channel,
-            home=cli_src.data_dir,
-            node=cli_src.node_rpc,
-            output="json",
-        ),
-        "UTF-8",
-    ).strip()
+    src_escrow_address = query_nft_on_escrow(cli_src, src_channel)
 
     rsp = query_nft_token(cli_src, denomid, tokenid)
     assert rsp["uri"] == tokenuri, rsp
@@ -252,19 +256,7 @@ def test_nft_transfer(cluster):
     assert rsp["owner"] == addr_dst, rsp
 
     # quert nft on mid chain's escrow address
-    mid_escrow_address = str(
-        cli_mid.raw(
-            "query",
-            "nft-transfer",
-            "escrow-address",
-            "nft",
-            mid_dst_channel,
-            home=cli_mid.data_dir,
-            node=cli_mid.node_rpc,
-            output="json",
-        ),
-        "UTF-8",
-    ).strip()
+    mid_escrow_address = query_nft_on_escrow(cli_mid, mid_dst_channel)
 
     rsp = query_nft_token(cli_mid, mid_denom_id, tokenid)
     assert rsp["uri"] == tokenuri, rsp
