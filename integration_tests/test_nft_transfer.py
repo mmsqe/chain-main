@@ -65,6 +65,27 @@ def query_nft_on_escrow(cli, channel):
     ).strip()
 
 
+def nft_transfer(cli, channel, addr_to, addr_from, denom_id, token_id):
+    return json.loads(
+        cli.raw(
+            "tx",
+            "nft-transfer",
+            "transfer",
+            "nft",
+            channel,
+            addr_to,
+            denom_id,
+            token_id,
+            "-y",
+            home=cli.data_dir,
+            from_=addr_from,
+            keyring_backend="test",
+            chain_id=cli.chain_id,
+            node=cli.node_rpc,
+        )
+    )
+
+
 # This function tests nft transfer from source chain -> mid chain -> destination chain and all the way back to source
 # chain following the same path
 def test_nft_transfer(cluster):
@@ -141,25 +162,7 @@ def test_nft_transfer(cluster):
     )
 
     # transfer nft on mid-destination chain
-    rsp = json.loads(
-        cli_src.raw(
-            "tx",
-            "nft-transfer",
-            "transfer",
-            "nft",
-            src_channel,
-            addr_mid,
-            denomid,
-            tokenid,
-            "-y",
-            home=cli_src.data_dir,
-            from_=addr_src,
-            keyring_backend="test",
-            chain_id=cli_src.chain_id,
-            node=cli_src.node_rpc,
-        )
-    )
-
+    rsp = nft_transfer(cli_src, src_channel, addr_mid, addr_src, denomid, tokenid)
     assert rsp["code"] == 0, rsp["raw_log"]
 
     # FIXME more stable way to wait for relaying
@@ -201,25 +204,7 @@ def test_nft_transfer(cluster):
     assert rsp["owner"] == src_escrow_address, rsp
 
     # transfer nft to destination chain
-    rsp = json.loads(
-        cli_mid.raw(
-            "tx",
-            "nft-transfer",
-            "transfer",
-            "nft",
-            mid_dst_channel,
-            addr_dst,
-            mid_denom_id,
-            tokenid,
-            "-y",
-            home=cli_mid.data_dir,
-            from_=addr_mid,
-            keyring_backend="test",
-            chain_id=cli_mid.chain_id,
-            node=cli_mid.node_rpc,
-        )
-    )
-
+    rsp = nft_transfer(cli_mid, mid_dst_channel, addr_dst, addr_mid, mid_denom_id, tokenid)
     assert rsp["code"] == 0, rsp["raw_log"]
 
     # FIXME more stable way to wait for relaying
@@ -263,25 +248,7 @@ def test_nft_transfer(cluster):
     assert rsp["owner"] == mid_escrow_address, rsp
 
     # transfer nft back to mid chain
-    rsp = json.loads(
-        cli_dst.raw(
-            "tx",
-            "nft-transfer",
-            "transfer",
-            "nft",
-            dst_channel,
-            addr_mid,
-            dst_denom_id,
-            tokenid,
-            "-y",
-            home=cli_dst.data_dir,
-            from_=addr_dst,
-            keyring_backend="test",
-            chain_id=cli_dst.chain_id,
-            node=cli_dst.node_rpc,
-        )
-    )
-
+    rsp = nft_transfer(cli_dst, dst_channel, addr_mid, addr_dst, dst_denom_id, tokenid)
     assert rsp["code"] == 0, rsp["raw_log"]
 
     # FIXME more stable way to wait for relaying
@@ -308,25 +275,7 @@ def test_nft_transfer(cluster):
     assert rsp["owner"] == addr_mid, rsp
 
     # transfer nft back to source chain
-    rsp = json.loads(
-        cli_mid.raw(
-            "tx",
-            "nft-transfer",
-            "transfer",
-            "nft",
-            mid_src_channel,
-            addr_src,
-            mid_denom_id,
-            tokenid,
-            "-y",
-            home=cli_mid.data_dir,
-            from_=addr_mid,
-            keyring_backend="test",
-            chain_id=cli_mid.chain_id,
-            node=cli_mid.node_rpc,
-        )
-    )
-
+    rsp = nft_transfer(cli_mid, mid_src_channel, addr_src, addr_mid, mid_denom_id, tokenid)
     assert rsp["code"] == 0, rsp["raw_log"]
 
     # FIXME more stable way to wait for relaying
