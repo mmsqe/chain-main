@@ -11,6 +11,7 @@ from dateutil.parser import isoparse
 from pystarport.cluster import SUPERVISOR_CONFIG_FILE
 from pystarport.ports import rpc_port
 
+from .ibc_utils import query_nft_denom
 from .utils import (
     cluster_fixture,
     parse_events,
@@ -375,18 +376,7 @@ def test_manual_upgrade_all(cosmovisor_cluster):
     cli = cluster.cosmos_cli()
 
     # check denom after upgrade
-    rsp = json.loads(
-        cli.raw(
-            "query",
-            "nft",
-            "denom",
-            "testdenomid",
-            home=cli.data_dir,
-            node=cli.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_denom(cli, "testdenomid")
     assert rsp["name"] == "testdenomname", rsp
     assert rsp["uri"] == "", rsp
 

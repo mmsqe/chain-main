@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 
@@ -64,3 +65,17 @@ def start_and_wait_relayer(
 
     query = relayer + ["query", "channels", "--chain"]
     return search_target(query, "channel", chains)
+
+
+def query_nft_denom(cli, denom_id):
+    return json.loads(
+        cli.raw(
+            "query",
+            "nft",
+            "denom",
+            denom_id,
+            home=cli.data_dir,
+            node=cli.node_rpc,
+            output="json",
+        )
+    )

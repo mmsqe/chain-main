@@ -1,11 +1,10 @@
 import json
-from re import A
 import time
 from pathlib import Path
 
 import pytest
 
-from .ibc_utils import start_and_wait_relayer
+from .ibc_utils import query_nft_denom, start_and_wait_relayer
 from .utils import cluster_fixture
 
 pytestmark = pytest.mark.ibc
@@ -153,18 +152,7 @@ def test_nft_transfer(cluster):
     mid_denom_id = "ibc/" + mid_class_hash
 
     # query denom on mid chain
-    rsp = json.loads(
-        cli_mid.raw(
-            "query",
-            "nft",
-            "denom",
-            mid_denom_id,
-            home=cli_mid.data_dir,
-            node=cli_mid.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_denom(cli_mid, mid_denom_id)
     assert rsp["uri"] == denomuri, rsp["uri"]
 
     # query nft on mid chain
@@ -274,18 +262,7 @@ def test_nft_transfer(cluster):
     dst_denom_id = "ibc/" + dst_class_hash
 
     # query denom on destination chain
-    rsp = json.loads(
-        cli_dst.raw(
-            "query",
-            "nft",
-            "denom",
-            dst_denom_id,
-            home=cli_dst.data_dir,
-            node=cli_dst.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_denom(cli_dst, dst_denom_id)
     assert rsp["uri"] == denomuri, rsp["uri"]
 
     # query nft on destination chain
