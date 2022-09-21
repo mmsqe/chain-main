@@ -20,6 +20,21 @@ def cluster(worker_index, pytestconfig, tmp_path_factory):
     )
 
 
+def query_nft_token(cli, denom_id, token_id):
+    return json.loads(
+        cli.raw(
+            "query",
+            "nft",
+            "token",
+            denom_id,
+            token_id,
+            home=cli.data_dir,
+            node=cli.node_rpc,
+            output="json",
+        )
+    )
+
+
 # This function tests nft transfer from source chain -> mid chain -> destination chain and all the way back to source
 # chain following the same path
 def test_nft_transfer(cluster):
@@ -156,19 +171,7 @@ def test_nft_transfer(cluster):
     assert rsp["uri"] == denomuri, rsp["uri"]
 
     # query nft on mid chain
-    rsp = json.loads(
-        cli_mid.raw(
-            "query",
-            "nft",
-            "token",
-            mid_denom_id,
-            tokenid,
-            home=cli_mid.data_dir,
-            node=cli_mid.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_token(cli_mid, mid_denom_id, tokenid)
     assert rsp["uri"] == tokenuri, rsp
     assert rsp["owner"] == addr_mid, rsp
 
@@ -187,19 +190,7 @@ def test_nft_transfer(cluster):
         "UTF-8",
     ).strip()
 
-    rsp = json.loads(
-        cli_src.raw(
-            "query",
-            "nft",
-            "token",
-            denomid,
-            tokenid,
-            home=cli_src.data_dir,
-            node=cli_src.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_token(cli_src, denomid, tokenid)
     assert rsp["uri"] == tokenuri, rsp
     assert rsp["owner"] == src_escrow_address, rsp
 
@@ -266,19 +257,7 @@ def test_nft_transfer(cluster):
     assert rsp["uri"] == denomuri, rsp["uri"]
 
     # query nft on destination chain
-    rsp = json.loads(
-        cli_dst.raw(
-            "query",
-            "nft",
-            "token",
-            dst_denom_id,
-            tokenid,
-            home=cli_dst.data_dir,
-            node=cli_dst.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_token(cli_dst, dst_denom_id, tokenid)
     assert rsp["uri"] == tokenuri, rsp
     assert rsp["owner"] == addr_dst, rsp
 
@@ -297,19 +276,7 @@ def test_nft_transfer(cluster):
         "UTF-8",
     ).strip()
 
-    rsp = json.loads(
-        cli_mid.raw(
-            "query",
-            "nft",
-            "token",
-            mid_denom_id,
-            tokenid,
-            home=cli_mid.data_dir,
-            node=cli_mid.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_token(cli_mid, mid_denom_id, tokenid)
     assert rsp["uri"] == tokenuri, rsp
     assert rsp["owner"] == mid_escrow_address, rsp
 
@@ -354,19 +321,7 @@ def test_nft_transfer(cluster):
     assert len(rsp["nfts"]) == 0, rsp
 
     # TODO: query nft on mid chain
-    rsp = json.loads(
-        cli_mid.raw(
-            "query",
-            "nft",
-            "token",
-            mid_denom_id,
-            tokenid,
-            home=cli_mid.data_dir,
-            node=cli_mid.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_token(cli_mid, mid_denom_id, tokenid)
     assert rsp["uri"] == tokenuri, rsp
     assert rsp["owner"] == addr_mid, rsp
 
@@ -411,18 +366,6 @@ def test_nft_transfer(cluster):
     assert len(rsp["nfts"]) == 0, rsp
 
     # query nft on source chain
-    rsp = json.loads(
-        cli_src.raw(
-            "query",
-            "nft",
-            "token",
-            denomid,
-            tokenid,
-            home=cli_src.data_dir,
-            node=cli_src.node_rpc,
-            output="json",
-        )
-    )
-
+    rsp = query_nft_token(cli_src, denomid, tokenid)
     assert rsp["uri"] == tokenuri, rsp
     assert rsp["owner"] == addr_src, rsp
