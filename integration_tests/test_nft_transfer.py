@@ -35,6 +35,20 @@ def query_nft_token(cli, denom_id, token_id):
     )
 
 
+def query_nft_class(cli, key, param):
+    return json.loads(
+        cli.raw(
+            "query",
+            "nft-transfer",
+            key,
+            param,
+            home=cli.data_dir,
+            node=cli.node_rpc,
+            output="json",
+        )
+    )
+
+
 # This function tests nft transfer from source chain -> mid chain -> destination chain and all the way back to source
 # chain following the same path
 def test_nft_transfer(cluster):
@@ -136,29 +150,17 @@ def test_nft_transfer(cluster):
     time.sleep(20)
 
     # get class hash on mid chain
-    mid_class_hash = json.loads(
-        cli_mid.raw(
-            "query",
-            "nft-transfer",
-            "class-hash",
-            "nft/" + mid_src_channel + "/" + denomid,
-            home=cli_mid.data_dir,
-            node=cli_mid.node_rpc,
-            output="json",
-        )
+    mid_class_hash = query_nft_class(
+        cli_mid,
+        "class-hash",
+        "nft/" + mid_src_channel + "/" + denomid,
     )["hash"]
 
     # get class trace on mid chain
-    mid_class_trace = json.loads(
-        cli_mid.raw(
-            "query",
-            "nft-transfer",
-            "class-trace",
-            mid_class_hash,
-            home=cli_mid.data_dir,
-            node=cli_mid.node_rpc,
-            output="json",
-        )
+    mid_class_trace = query_nft_class(
+        cli_mid,
+        "class-trace",
+        mid_class_hash,
     )["class_trace"]
 
     assert mid_class_trace["base_class_id"] == denomid, mid_class_trace
@@ -220,29 +222,17 @@ def test_nft_transfer(cluster):
     time.sleep(20)
 
     # get class hash on destination chain
-    dst_class_hash = json.loads(
-        cli_dst.raw(
-            "query",
-            "nft-transfer",
-            "class-hash",
-            "nft/" + dst_channel + "/nft/" + mid_src_channel + "/" + denomid,
-            home=cli_dst.data_dir,
-            node=cli_dst.node_rpc,
-            output="json",
-        )
+    dst_class_hash = query_nft_class(
+        cli_dst,
+        "class-hash",
+        "nft/" + dst_channel + "/nft/" + mid_src_channel + "/" + denomid,
     )["hash"]
 
     # get class trace on destination chain
-    dst_class_trace = json.loads(
-        cli_dst.raw(
-            "query",
-            "nft-transfer",
-            "class-trace",
-            dst_class_hash,
-            home=cli_dst.data_dir,
-            node=cli_dst.node_rpc,
-            output="json",
-        )
+    dst_class_trace = query_nft_class(
+        cli_dst,
+        "class-trace",
+        dst_class_hash,
     )["class_trace"]
 
     assert dst_class_trace["base_class_id"] == denomid, dst_class_trace
