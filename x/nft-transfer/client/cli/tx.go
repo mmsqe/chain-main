@@ -93,7 +93,7 @@ corresponding to the counterparty channel. Any timeout set to 0 is disabled.`),
 					now := time.Now().UnixNano()
 					consensusStateTimestamp := consensusState.GetTimestamp()
 					if now > 0 {
-						now := uint64(now)
+						now := uint64(now & 0xffffffffff)
 						if now > consensusStateTimestamp {
 							timeoutTimestamp = now + timeoutTimestamp
 						} else {

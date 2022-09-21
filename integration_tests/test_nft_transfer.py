@@ -86,8 +86,8 @@ def nft_transfer(cli, channel, addr_to, addr_from, denom_id, token_id):
     )
 
 
-# This function tests nft transfer from source chain -> mid chain -> destination chain and all the way back to source
-# chain following the same path
+# This function tests nft transfer from source chain -> mid chain -> destination chain
+# and all the way back to source chain following the same path
 def test_nft_transfer(cluster):
     src_channel, mid_src_channel = start_and_wait_relayer(cluster, "nft")
     mid_dst_channel, dst_channel = start_and_wait_relayer(
@@ -204,7 +204,14 @@ def test_nft_transfer(cluster):
     assert rsp["owner"] == src_escrow_address, rsp
 
     # transfer nft to destination chain
-    rsp = nft_transfer(cli_mid, mid_dst_channel, addr_dst, addr_mid, mid_denom_id, tokenid)
+    rsp = nft_transfer(
+        cli_mid,
+        mid_dst_channel,
+        addr_dst,
+        addr_mid,
+        mid_denom_id,
+        tokenid,
+    )
     assert rsp["code"] == 0, rsp["raw_log"]
 
     # FIXME more stable way to wait for relaying
@@ -275,7 +282,14 @@ def test_nft_transfer(cluster):
     assert rsp["owner"] == addr_mid, rsp
 
     # transfer nft back to source chain
-    rsp = nft_transfer(cli_mid, mid_src_channel, addr_src, addr_mid, mid_denom_id, tokenid)
+    rsp = nft_transfer(
+        cli_mid,
+        mid_src_channel,
+        addr_src,
+        addr_mid,
+        mid_denom_id,
+        tokenid,
+    )
     assert rsp["code"] == 0, rsp["raw_log"]
 
     # FIXME more stable way to wait for relaying
