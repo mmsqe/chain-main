@@ -19,7 +19,7 @@ pytest-github-actions-annotate-failures = "^0.1.1"
 protobuf = "^3.19.4"
 PyYAML = "^5.3.1"
 python-dateutil = "^2.8.1"
-pystarport = { git = "https://github.com/crypto-com/pystarport.git", branch = "main" }
+pystarport = { git = "https://github.com/mmsqe/pystarport.git", branch = "update_protobuf" }
 chainlibpy = "^2.2.0"
 
 [tool.poetry.dev-dependencies]

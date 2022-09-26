@@ -481,9 +481,9 @@ tomlkit = "^0.7.0"
 
 [package.source]
 type = "git"
-url = "https://github.com/crypto-com/pystarport.git"
-reference = "main"
-resolved_reference = "c3028081386e8489171607e0aed6e68d1ff87d43"
+url = "https://github.com/mmsqe/pystarport.git"
+reference = "update_protobuf"
+resolved_reference = "1f34b8d2ed1678260cc84c798559d6a9a7d8d258"
 
 [[package]]
 name = "pytest"
@@ -714,7 +714,7 @@ python-versions = ">=3.6"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "bbcc37806a11ca39a13342e5de88076865e0ba1eaf418449d0ab683a0ae23d2e"
+content-hash = "4304f91815fdad800bbce64beb5be2e1095652701138eb43f271c1a96a2131b7"
 
 [metadata.files]
 atomicwrites = [
