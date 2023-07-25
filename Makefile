@@ -10,6 +10,7 @@ NETWORK ?= mainnet
 COVERAGE ?= coverage.txt
 BUILDDIR ?= $(CURDIR)/build
 LEDGER_ENABLED ?= true
+DOCKER := $(shell which docker)
 
 export GO111MODULE = on
 
@@ -295,7 +296,19 @@ release-dry-run:
 document:
 	make all -f MakefileDoc
 
-# generate protobuf files
-# ./proto -> ./x
-proto-all:
-	make proto-all -f MakefileDoc
+###############################################################################
+###                                Protobuf                                 ###
+###############################################################################
+
+protoVer=0.11.6
+protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
+protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
+
+# ------
+# NOTE: If you are experiencing problems running these commands, try deleting
+#       the docker images and execute the desired command again.
+#
+
+proto-gen:
+	@echo "Generating Protobuf files"
+	$(protoImage) sh ./scripts/protocgen.sh
