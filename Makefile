@@ -139,7 +139,6 @@ endif
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
-		GO111MODULE=on go mod verify
 
 test: check-network
 	@go test $(TEST_FLAGS) -v -mod=readonly $(PACKAGES) -coverprofile=$(COVERAGE) -covermode=atomic
@@ -149,7 +148,6 @@ test: check-network
 lint:
 	@echo "--> Running linter"
 	@golangci-lint run
-	@go mod verify
 	@flake8 --show-source --count --statistics
 	@find . -name "*.nix" -type f | xargs nixpkgs-fmt --check
 

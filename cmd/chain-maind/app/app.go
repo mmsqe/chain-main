@@ -8,18 +8,22 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	conf "github.com/cosmos/cosmos-sdk/client/config"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 
+	dbm "github.com/cometbft/cometbft-db"
+	tmcfg "github.com/cometbft/cometbft/config"
+	tmcli "github.com/cometbft/cometbft/libs/cli"
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/imdario/mergo"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	tmcfg "github.com/tendermint/tendermint/config"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
+	"github.com/spf13/viper"
 
+	rosettaCmd "cosmossdk.io/tools/rosetta/cmd"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
@@ -34,11 +38,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	"github.com/crypto-org-chain/chain-main/v4/app"
 	"github.com/crypto-org-chain/chain-main/v4/app/params"
-	"github.com/crypto-org-chain/chain-main/v4/config"
+	chainconfig "github.com/crypto-org-chain/chain-main/v4/config"
 	chainmaincli "github.com/crypto-org-chain/chain-main/v4/x/chainmain/client/cli"
 
 	memiavlcfg "github.com/crypto-org-chain/cronos/store/config"
@@ -49,7 +54,7 @@ const EnvPrefix = "CRO"
 // NewRootCmd creates a new root command for chain-maind. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
-	config.SetConfig()
+	chainconfig.SetConfig()
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
@@ -120,7 +125,6 @@ func initAppConfig() (string, interface{}) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	// authclient.Codec = encodingConfig.Marshaler
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
@@ -134,17 +138,17 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 			"app_state": map[string]interface{}{
 				"staking": map[string]interface{}{
 					"params": map[string]string{
-						"bond_denom": config.BaseCoinUnit,
+						"bond_denom": chainconfig.BaseCoinUnit,
 					},
 				},
 				"gov": map[string]interface{}{
 					"deposit_params": map[string]interface{}{
-						"min_deposit": sdk.NewCoins(sdk.NewCoin(config.BaseCoinUnit, govv1.DefaultMinDepositTokens)),
+						"min_deposit": sdk.NewCoins(sdk.NewCoin(chainconfig.BaseCoinUnit, govv1.DefaultMinDepositTokens)),
 					},
 				},
 				"mint": map[string]interface{}{
 					"params": map[string]string{
-						"mint_denom": config.BaseCoinUnit,
+						"mint_denom": chainconfig.BaseCoinUnit,
 					},
 				},
 				"bank": map[string]interface{}{
@@ -155,19 +159,19 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 							"description": "The native token of Crypto.org Chain.",
 							"denom_units": []interface{}{
 								map[string]interface{}{
-									"denom":    config.BaseCoinUnit,
+									"denom":    chainconfig.BaseCoinUnit,
 									"exponent": 0,
 									"aliases": []interface{}{
 										"carson",
 									},
 								},
 								map[string]interface{}{
-									"denom":    config.HumanCoinUnit,
+									"denom":    chainconfig.HumanCoinUnit,
 									"exponent": 8,
 								},
 							},
-							"base":    config.BaseCoinUnit,
-							"display": config.HumanCoinUnit,
+							"base":    chainconfig.BaseCoinUnit,
+							"display": chainconfig.HumanCoinUnit,
 						},
 					},
 				},
@@ -213,10 +217,11 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 		return WriteFile(cleanedPath, bz, 0600)
 	}
+	a := appCreator{encodingConfig}
 
 	rootCmd.AddCommand(
 		initCmd,
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome, genutiltypes.DefaultMessageValidator),
 		genutilcli.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
@@ -225,11 +230,10 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		chainmaincli.AddTestnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
 		conf.Cmd(),
-		pruning.PruningCmd(newApp),
-		snapshot.Cmd(newApp),
+		pruning.PruningCmd(a.newApp),
+		snapshot.Cmd(a.newApp),
 	)
-
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, exportAppStateAndTMValidators, addModuleInitFlags)
+	server.AddCommands(rootCmd, app.DefaultNodeHome, a.newApp, exportAppStateAndTMValidators, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -240,7 +244,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	)
 
 	// add rosetta
-	rootCmd.AddCommand(server.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
+	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
 
 	// versiondb changeset commands
 	changeSetCmd := ChangeSetCmd()
@@ -305,29 +309,58 @@ func txCommand() *cobra.Command {
 }
 
 // newApp is an AppCreator
-func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
+func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
+	home := cast.ToString(appOpts.Get(flags.FlagHome))
+	snapshotDir := filepath.Join(home, "data", "snapshots")
+	if err := os.MkdirAll(snapshotDir, os.ModePerm); err != nil {
+		panic(err)
+	}
+
 	skipUpgradeHeights := make(map[int64]bool)
 	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
 		skipUpgradeHeights[int64(h)] = true
 	}
 
+	// Setup chainId
+	chainID := cast.ToString(appOpts.Get(flags.FlagChainID))
+	if len(chainID) == 0 {
+		v := viper.New()
+		v.AddConfigPath(filepath.Join(home, "config"))
+		v.SetConfigName("client")
+		v.SetConfigType("toml")
+		if err := v.ReadInConfig(); err != nil {
+			panic(err)
+		}
+		conf := new(config.ClientConfig)
+		if err := v.Unmarshal(conf); err != nil {
+			panic(err)
+		}
+		chainID = conf.ChainID
+	}
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
+	baseappOptions = append(baseappOptions, func(app *baseapp.BaseApp) {
+		baseapp.SetChainID(chainID)
+	})
 	return app.New(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
+		a.encCfg,
+		// this line is used by starport scaffolding # stargate/root/appArgument
 		appOpts,
 		baseappOptions...,
 	)
+}
+
+type appCreator struct {
+	encCfg params.EncodingConfig
 }
 
 // exportAppStateAndTMValidators creates a new chain app (optionally at a given height)
 // and exports state.
 func exportAppStateAndTMValidators(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
-	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
-
+	appOpts servertypes.AppOptions, modulesToExport []string) (servertypes.ExportedApp, error) {
 	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
 
@@ -341,6 +374,5 @@ func exportAppStateAndTMValidators(
 	} else {
 		a = app.New(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, appOpts)
 	}
-
-	return a.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return a.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }

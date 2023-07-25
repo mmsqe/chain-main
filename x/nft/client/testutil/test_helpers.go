@@ -5,12 +5,12 @@ package testutil
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/cometbft/cometbft/libs/cli"
 
+	"cosmossdk.io/simapp"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
@@ -18,9 +18,9 @@ import (
 	"github.com/crypto-org-chain/chain-main/v4/app"
 	nftcli "github.com/crypto-org-chain/chain-main/v4/x/nft/client/cli"
 
-	pruningtypes "github.com/cosmos/cosmos-sdk/pruning/types"
+	dbm "github.com/cometbft/cometbft-db"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	dbm "github.com/tendermint/tm-db"
+	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
 )
 
 func GetApp(val network.Validator) servertypes.Application {

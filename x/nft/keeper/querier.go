@@ -5,7 +5,7 @@ package keeper
 import (
 	"encoding/binary"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
 	newsdkerrors "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -15,31 +15,31 @@ import (
 	"github.com/crypto-org-chain/chain-main/v4/x/nft/types"
 )
 
-// NewQuerier is the module level router for state queries
-// (Amino is still needed for Ledger at the moment)
-// nolint: staticcheck
-func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
-		switch path[0] {
-		case types.QuerySupply:
-			return querySupply(ctx, req, k, legacyQuerierCdc)
-		case types.QueryOwner:
-			return queryOwner(ctx, req, k, legacyQuerierCdc)
-		case types.QueryCollection:
-			return queryCollection(ctx, req, k, legacyQuerierCdc)
-		case types.QueryDenom:
-			return queryDenom(ctx, req, k, legacyQuerierCdc)
-		case types.QueryDenomByName:
-			return queryDenomByName(ctx, req, k, legacyQuerierCdc)
-		case types.QueryDenoms:
-			return queryDenoms(ctx, req, k, legacyQuerierCdc)
-		case types.QueryNFT:
-			return queryNFT(ctx, req, k, legacyQuerierCdc)
-		default:
-			return nil, newsdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
-		}
-	}
-}
+// // NewQuerier is the module level router for state queries
+// // (Amino is still needed for Ledger at the moment)
+// // nolint: staticcheck
+// func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+// 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
+// 		switch path[0] {
+// 		case types.QuerySupply:
+// 			return querySupply(ctx, req, k, legacyQuerierCdc)
+// 		case types.QueryOwner:
+// 			return queryOwner(ctx, req, k, legacyQuerierCdc)
+// 		case types.QueryCollection:
+// 			return queryCollection(ctx, req, k, legacyQuerierCdc)
+// 		case types.QueryDenom:
+// 			return queryDenom(ctx, req, k, legacyQuerierCdc)
+// 		case types.QueryDenomByName:
+// 			return queryDenomByName(ctx, req, k, legacyQuerierCdc)
+// 		case types.QueryDenoms:
+// 			return queryDenoms(ctx, req, k, legacyQuerierCdc)
+// 		case types.QueryNFT:
+// 			return queryNFT(ctx, req, k, legacyQuerierCdc)
+// 		default:
+// 			return nil, newsdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
+// 		}
+// 	}
+// }
 
 // (Amino is still needed for Ledger at the moment)
 // nolint: staticcheck

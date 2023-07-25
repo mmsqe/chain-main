@@ -2,219 +2,209 @@
 // Modifications Copyright (c) 2021-present Crypto.org (licensed under the Apache License, Version 2.0)
 package keeper_test
 
-import (
-	"encoding/binary"
+// func (suite *KeeperSuite) TestNewQuerier() {
+// 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
+// 	query := abci.RequestQuery{
+// 		Path: "",
+// 		Data: []byte{},
+// 	}
+// 	_, err := querier(suite.ctx, []string{"foo", "bar"}, query)
+// 	suite.Error(err)
+// }
 
-	abci "github.com/tendermint/tendermint/abci/types"
+// func (suite *KeeperSuite) TestQuerySupply() {
+// 	// MintNFT shouldn't fail when collection does not exist
+// 	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
+// 	suite.NoError(err)
 
-	"github.com/crypto-org-chain/chain-main/v4/x/nft/exported"
-	keep "github.com/crypto-org-chain/chain-main/v4/x/nft/keeper"
-	"github.com/crypto-org-chain/chain-main/v4/x/nft/types"
-)
+// 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
 
-func (suite *KeeperSuite) TestNewQuerier() {
-	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
-	query := abci.RequestQuery{
-		Path: "",
-		Data: []byte{},
-	}
-	_, err := querier(suite.ctx, []string{"foo", "bar"}, query)
-	suite.Error(err)
-}
+// 	query := abci.RequestQuery{
+// 		Path: "",
+// 		Data: []byte{},
+// 	}
 
-func (suite *KeeperSuite) TestQuerySupply() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
-	suite.NoError(err)
+// 	query.Path = "/custom/nft/supply"
+// 	query.Data = []byte("?")
 
-	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
+// 	res, err := querier(suite.ctx, []string{"supply"}, query)
+// 	suite.Error(err)
+// 	suite.Nil(res)
 
-	query := abci.RequestQuery{
-		Path: "",
-		Data: []byte{},
-	}
+// 	queryCollectionParams := types.NewQuerySupplyParams(denomID2, nil)
+// 	bz, errRes := suite.legacyAmino.MarshalJSON(queryCollectionParams)
+// 	suite.Nil(errRes)
+// 	query.Data = bz
+// 	res, err = querier(suite.ctx, []string{"supply"}, query)
+// 	suite.NoError(err)
+// 	supplyResp := binary.LittleEndian.Uint64(res)
+// 	suite.Equal(0, int(supplyResp))
 
-	query.Path = "/custom/nft/supply"
-	query.Data = []byte("?")
+// 	queryCollectionParams = types.NewQuerySupplyParams(denomID, nil)
+// 	bz, errRes = suite.legacyAmino.MarshalJSON(queryCollectionParams)
+// 	suite.Nil(errRes)
+// 	query.Data = bz
 
-	res, err := querier(suite.ctx, []string{"supply"}, query)
-	suite.Error(err)
-	suite.Nil(res)
+// 	res, err = querier(suite.ctx, []string{"supply"}, query)
+// 	suite.NoError(err)
+// 	suite.NotNil(res)
 
-	queryCollectionParams := types.NewQuerySupplyParams(denomID2, nil)
-	bz, errRes := suite.legacyAmino.MarshalJSON(queryCollectionParams)
-	suite.Nil(errRes)
-	query.Data = bz
-	res, err = querier(suite.ctx, []string{"supply"}, query)
-	suite.NoError(err)
-	supplyResp := binary.LittleEndian.Uint64(res)
-	suite.Equal(0, int(supplyResp))
+// 	supplyResp = binary.LittleEndian.Uint64(res)
+// 	suite.Equal(1, int(supplyResp))
+// }
 
-	queryCollectionParams = types.NewQuerySupplyParams(denomID, nil)
-	bz, errRes = suite.legacyAmino.MarshalJSON(queryCollectionParams)
-	suite.Nil(errRes)
-	query.Data = bz
+// func (suite *KeeperSuite) TestQueryCollection() {
+// 	// MintNFT shouldn't fail when collection does not exist
+// 	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
+// 	suite.NoError(err)
 
-	res, err = querier(suite.ctx, []string{"supply"}, query)
-	suite.NoError(err)
-	suite.NotNil(res)
+// 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
 
-	supplyResp = binary.LittleEndian.Uint64(res)
-	suite.Equal(1, int(supplyResp))
-}
+// 	query := abci.RequestQuery{
+// 		Path: "",
+// 		Data: []byte{},
+// 	}
 
-func (suite *KeeperSuite) TestQueryCollection() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
-	suite.NoError(err)
+// 	query.Path = "/custom/nft/collection"
 
-	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
+// 	query.Data = []byte("?")
+// 	res, err := querier(suite.ctx, []string{"collection"}, query)
+// 	suite.Error(err)
+// 	suite.Nil(res)
 
-	query := abci.RequestQuery{
-		Path: "",
-		Data: []byte{},
-	}
+// 	queryCollectionParams := types.NewQuerySupplyParams(denomID2, nil)
+// 	bz, errRes := suite.legacyAmino.MarshalJSON(queryCollectionParams)
+// 	suite.Nil(errRes)
 
-	query.Path = "/custom/nft/collection"
+// 	query.Data = bz
+// 	_, err = querier(suite.ctx, []string{"collection"}, query)
+// 	suite.NoError(err)
 
-	query.Data = []byte("?")
-	res, err := querier(suite.ctx, []string{"collection"}, query)
-	suite.Error(err)
-	suite.Nil(res)
+// 	queryCollectionParams = types.NewQuerySupplyParams(denomID, nil)
+// 	bz, errRes = suite.legacyAmino.MarshalJSON(queryCollectionParams)
+// 	suite.Nil(errRes)
 
-	queryCollectionParams := types.NewQuerySupplyParams(denomID2, nil)
-	bz, errRes := suite.legacyAmino.MarshalJSON(queryCollectionParams)
-	suite.Nil(errRes)
+// 	query.Data = bz
+// 	res, err = querier(suite.ctx, []string{"collection"}, query)
+// 	suite.NoError(err)
+// 	suite.NotNil(res)
 
-	query.Data = bz
-	_, err = querier(suite.ctx, []string{"collection"}, query)
-	suite.NoError(err)
+// 	var collection types.Collection
+// 	types.ModuleCdc.MustUnmarshalJSON(res, &collection)
+// 	suite.Len(collection.NFTs, 1)
+// }
 
-	queryCollectionParams = types.NewQuerySupplyParams(denomID, nil)
-	bz, errRes = suite.legacyAmino.MarshalJSON(queryCollectionParams)
-	suite.Nil(errRes)
+// func (suite *KeeperSuite) TestQueryOwner() {
+// 	// MintNFT shouldn't fail when collection does not exist
+// 	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
+// 	suite.NoError(err)
 
-	query.Data = bz
-	res, err = querier(suite.ctx, []string{"collection"}, query)
-	suite.NoError(err)
-	suite.NotNil(res)
+// 	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenData, address, address)
+// 	suite.NoError(err)
 
-	var collection types.Collection
-	types.ModuleCdc.MustUnmarshalJSON(res, &collection)
-	suite.Len(collection.NFTs, 1)
-}
+// 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
+// 	query := abci.RequestQuery{
+// 		Path: "/custom/nft/owner",
+// 		Data: []byte{},
+// 	}
 
-func (suite *KeeperSuite) TestQueryOwner() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
-	suite.NoError(err)
+// 	query.Data = []byte("?")
+// 	_, err = querier(suite.ctx, []string{"owner"}, query)
+// 	suite.Error(err)
 
-	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenData, address, address)
-	suite.NoError(err)
+// 	// query the balance using no denomID so that all denoms will be returns
+// 	params := types.NewQuerySupplyParams("", address)
+// 	bz, err2 := suite.legacyAmino.MarshalJSON(params)
+// 	suite.Nil(err2)
+// 	query.Data = bz
 
-	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
-	query := abci.RequestQuery{
-		Path: "/custom/nft/owner",
-		Data: []byte{},
-	}
+// 	var out types.Owner
+// 	res, err := querier(suite.ctx, []string{"owner"}, query)
+// 	suite.NoError(err)
+// 	suite.NotNil(res)
 
-	query.Data = []byte("?")
-	_, err = querier(suite.ctx, []string{"owner"}, query)
-	suite.Error(err)
+// 	suite.legacyAmino.MustUnmarshalJSON(res, &out)
 
-	// query the balance using no denomID so that all denoms will be returns
-	params := types.NewQuerySupplyParams("", address)
-	bz, err2 := suite.legacyAmino.MarshalJSON(params)
-	suite.Nil(err2)
-	query.Data = bz
+// 	// build the owner using both denoms
+// 	idCollection1 := types.NewIDCollection(denomID, []string{tokenID})
+// 	idCollection2 := types.NewIDCollection(denomID2, []string{tokenID})
+// 	owner := types.NewOwner(address, idCollection1, idCollection2)
 
-	var out types.Owner
-	res, err := querier(suite.ctx, []string{"owner"}, query)
-	suite.NoError(err)
-	suite.NotNil(res)
+// 	suite.EqualValues(out.String(), owner.String())
+// }
 
-	suite.legacyAmino.MustUnmarshalJSON(res, &out)
+// func (suite *KeeperSuite) TestQueryNFT() {
+// 	// MintNFT shouldn't fail when collection does not exist
+// 	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
+// 	suite.NoError(err)
 
-	// build the owner using both denoms
-	idCollection1 := types.NewIDCollection(denomID, []string{tokenID})
-	idCollection2 := types.NewIDCollection(denomID2, []string{tokenID})
-	owner := types.NewOwner(address, idCollection1, idCollection2)
+// 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
 
-	suite.EqualValues(out.String(), owner.String())
-}
+// 	query := abci.RequestQuery{
+// 		Path: "",
+// 		Data: []byte{},
+// 	}
+// 	query.Path = "/custom/nft/nft"
+// 	var res []byte
 
-func (suite *KeeperSuite) TestQueryNFT() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
-	suite.NoError(err)
+// 	query.Data = []byte("?")
+// 	res, err = querier(suite.ctx, []string{"nft"}, query)
+// 	suite.Error(err)
+// 	suite.Nil(res)
 
-	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
+// 	params := types.NewQueryNFTParams(denomID2, tokenID2)
+// 	bz, err2 := suite.legacyAmino.MarshalJSON(params)
+// 	suite.Nil(err2)
 
-	query := abci.RequestQuery{
-		Path: "",
-		Data: []byte{},
-	}
-	query.Path = "/custom/nft/nft"
-	var res []byte
+// 	query.Data = bz
+// 	res, err = querier(suite.ctx, []string{"nft"}, query)
+// 	suite.Error(err)
+// 	suite.Nil(res)
 
-	query.Data = []byte("?")
-	res, err = querier(suite.ctx, []string{"nft"}, query)
-	suite.Error(err)
-	suite.Nil(res)
+// 	params = types.NewQueryNFTParams(denomID, tokenID)
+// 	bz, err2 = suite.legacyAmino.MarshalJSON(params)
+// 	suite.Nil(err2)
 
-	params := types.NewQueryNFTParams(denomID2, tokenID2)
-	bz, err2 := suite.legacyAmino.MarshalJSON(params)
-	suite.Nil(err2)
+// 	query.Data = bz
+// 	res, err = querier(suite.ctx, []string{"nft"}, query)
+// 	suite.NoError(err)
+// 	suite.NotNil(res)
 
-	query.Data = bz
-	res, err = querier(suite.ctx, []string{"nft"}, query)
-	suite.Error(err)
-	suite.Nil(res)
+// 	var out exported.NFT
+// 	suite.legacyAmino.MustUnmarshalJSON(res, &out)
 
-	params = types.NewQueryNFTParams(denomID, tokenID)
-	bz, err2 = suite.legacyAmino.MarshalJSON(params)
-	suite.Nil(err2)
+// 	suite.Equal(out.GetID(), tokenID)
+// 	suite.Equal(out.GetURI(), tokenURI)
+// 	suite.Equal(out.GetOwner(), address)
+// }
 
-	query.Data = bz
-	res, err = querier(suite.ctx, []string{"nft"}, query)
-	suite.NoError(err)
-	suite.NotNil(res)
+// func (suite *KeeperSuite) TestQueryDenoms() {
+// 	// MintNFT shouldn't fail when collection does not exist
+// 	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
+// 	suite.NoError(err)
 
-	var out exported.NFT
-	suite.legacyAmino.MustUnmarshalJSON(res, &out)
+// 	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenData, address, address)
+// 	suite.NoError(err)
 
-	suite.Equal(out.GetID(), tokenID)
-	suite.Equal(out.GetURI(), tokenURI)
-	suite.Equal(out.GetOwner(), address)
-}
+// 	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
 
-func (suite *KeeperSuite) TestQueryDenoms() {
-	// MintNFT shouldn't fail when collection does not exist
-	err := suite.keeper.MintNFT(suite.ctx, denomID, tokenID, tokenNm, tokenURI, tokenData, address, address)
-	suite.NoError(err)
+// 	query := abci.RequestQuery{
+// 		Path: "",
+// 		Data: []byte{},
+// 	}
+// 	var res []byte
+// 	query.Path = "/custom/nft/denoms"
 
-	err = suite.keeper.MintNFT(suite.ctx, denomID2, tokenID, tokenNm, tokenURI, tokenData, address, address)
-	suite.NoError(err)
+// 	res, err = querier(suite.ctx, []string{"denoms"}, query)
+// 	suite.NoError(err)
+// 	suite.NotNil(res)
 
-	querier := keep.NewQuerier(suite.keeper, suite.legacyAmino)
+// 	denoms := []string{denomID, denomID2}
 
-	query := abci.RequestQuery{
-		Path: "",
-		Data: []byte{},
-	}
-	var res []byte
-	query.Path = "/custom/nft/denoms"
+// 	var out []types.Denom
+// 	suite.legacyAmino.MustUnmarshalJSON(res, &out)
 
-	res, err = querier(suite.ctx, []string{"denoms"}, query)
-	suite.NoError(err)
-	suite.NotNil(res)
-
-	denoms := []string{denomID, denomID2}
-
-	var out []types.Denom
-	suite.legacyAmino.MustUnmarshalJSON(res, &out)
-
-	for key, denomInQuestion := range out {
-		suite.Equal(denomInQuestion.Id, denoms[key])
-	}
-}
+// 	for key, denomInQuestion := range out {
+// 		suite.Equal(denomInQuestion.Id, denoms[key])
+// 	}
+// }
