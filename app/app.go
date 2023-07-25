@@ -197,6 +197,7 @@ var (
 		supply.AppModuleBasic{},
 		chainmain.AppModuleBasic{},
 		nft.AppModuleBasic{},
+		crisis.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -682,6 +683,7 @@ func New(
 		consensusparamtypes.ModuleName,
 	)
 
+	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
 
