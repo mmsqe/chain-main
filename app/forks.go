@@ -6,7 +6,7 @@ import (
 
 // TODO decide the fork heights
 var SlashingForkHeights = map[string]int64{
-	"crypto-org-chain-mainnet-1": 0,
+	"crypto-org-chain-mainnet-1": 1000000,
 	"testnet-croeseid-4":         0,
 }
 

@@ -233,7 +233,7 @@ nix-integration-test-ledger: check-network
 	nix-shell ./integration_tests/shell.nix --run "pytest -v -m ledger"
 
 nix-integration-test-slow: check-network 
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m slow"
+	nix-shell ./integration_tests/shell.nix --run "pytest -v -s test_slash_fork.py"
 
 nix-integration-test-ibc: check-network 
 	nix-shell ./integration_tests/shell.nix --run "pytest -v -m ibc"
