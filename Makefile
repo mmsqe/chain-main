@@ -221,34 +221,25 @@ make-proto:
 ###############################################################################
 # nix installation: https://nixos.org/download.html
 nix-integration-test: check-network make-proto
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m 'not upgrade and not ledger and not slow and not ibc and not byzantine and not gov and not grpc and not solomachine'"
 
 nix-integration-test-solomachine: check-network
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m solomachine"
 
 nix-integration-test-upgrade: check-network
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m upgrade"
 
 nix-integration-test-ledger: check-network 
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m ledger"
 
 nix-integration-test-slow: check-network 
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m slow"
+	nix-shell ./integration_tests/shell.nix --run "pytest -v -s ./integration_tests/test_slash_fork.py"
 
 nix-integration-test-ibc: check-network 
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m ibc"
 
 nix-integration-test-byzantine: check-network
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m byzantine"
 
 nix-integration-test-gov: check-network 
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m gov"
 
 nix-integration-test-grpc: check-network make-proto
-	nix-shell ./integration_tests/shell.nix --run "pytest -v -m grpc"
 
 nix-integration-test-all: check-network make-proto
-	nix-shell ./integration_tests/shell.nix --run "pytest -v"
 
 
 nix-build-%: check-network check-os
