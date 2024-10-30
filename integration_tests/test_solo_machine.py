@@ -88,6 +88,19 @@ class SoloMachine(object):
         os.environ["SOLO_RPC_ADDRESS"] = f"http://127.0.0.1:{self.rpc_port}"
         os.environ["SOLO_TRUSTED_HASH"] = self.trusted_hash
         os.environ["SOLO_TRUSTED_HEIGHT"] = self.trusted_height
+        print(f'export SOLO_DB_URI="{os.environ["SOLO_DB_URI"]}"')
+        print(f'export SOLO_SIGNER="{os.environ["SOLO_SIGNER"]}"')
+        print(f'export SOLO_MNEMONIC="{os.environ["SOLO_MNEMONIC"]}"')
+        print(f'export SOLO_HD_PATH="{os.environ["SOLO_HD_PATH"]}"')
+        print(f'export SOLO_ACCOUNT_PREFIX="{os.environ["SOLO_ACCOUNT_PREFIX"]}"')
+        print(f'export SOLO_ADDRESS_ALGO="{os.environ["SOLO_ADDRESS_ALGO"]}"')
+        print(f'export SOLO_FEE_DENOM="{os.environ["SOLO_FEE_DENOM"]}"')
+        print(f'export SOLO_FEE_AMOUNT="{os.environ["SOLO_FEE_AMOUNT"]}"')
+        print(f'export SOLO_GAS_LIMIT="{os.environ["SOLO_GAS_LIMIT"]}"')
+        print(f'export SOLO_GRPC_ADDRESS="{os.environ["SOLO_GRPC_ADDRESS"]}"')
+        print(f'export SOLO_RPC_ADDRESS="{os.environ["SOLO_RPC_ADDRESS"]}"')
+        print(f'export SOLO_TRUSTED_HASH="{os.environ["SOLO_TRUSTED_HASH"]}"')
+        print(f'export SOLO_TRUSTED_HEIGHT="{os.environ["SOLO_TRUSTED_HEIGHT"]}"')
 
     def prepare(self):
         self.get_chain_info()
