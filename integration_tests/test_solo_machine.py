@@ -98,6 +98,7 @@ class SoloMachine(object):
             cmd = f"{self.bin_file} --output json {sub_cmd}"
         else:
             cmd = f"{self.bin_file} {sub_cmd}"
+        print("mm-cmd", cmd)
         output = interact(cmd)
         data = parse_output(output, json_output)
         return data
